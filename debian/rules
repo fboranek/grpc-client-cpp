@@ -1,0 +1,18 @@
+#!/usr/bin/make -f
+
+# Uncomment this to turn on verbose mode.
+# export DH_VERBOSE=1
+
+%:
+	dh $@
+
+override_dh_strip:
+	# noop
+
+override_dh_installsystemd:
+	dh_installsystemd --name=grpc-server
+
+#   debian/rules override_dh_installsystemd
+#make[1]: Entering directory '/tmp/tmp.21EqomKhCz'
+#dh_installsystemd -p grpc-server --no-start --name=grpc-server
+#make[1]: Leaving directory '/tmp/tmp.21EqomKhCz'

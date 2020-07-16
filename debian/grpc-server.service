@@ -1,0 +1,12 @@
+[Unit]
+Description=Test gRPC Server
+
+[Service]
+LimitNOFILE=32768
+ExecStart=/opt/grpc/bin/grpc-server
+
+Restart=always
+RestartSec=1
+
+[Install]
+WantedBy=multi-user.target

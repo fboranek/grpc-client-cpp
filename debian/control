@@ -1,0 +1,28 @@
+Source: grpc-test
+Section: misc
+Priority: extra
+Maintainer: Frantisek Boranek <fboranek@example.com>
+Homepage: https://gitlab.seznam.net/fboranek/main/tree/master/grpc-client
+Build-Depends:
+ build-essential,
+ cmake (>= 3.12),
+ debhelper (>= 12),
+ libgrpc++-dev (>= 1.26.0),
+ protobuf-compiler-grpc (>= 1.26.0),
+Standards-Version: 3.9.4
+
+Package: grpc-server
+Architecture: any
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+Description: gRPC Server
+ gRPC Server
+
+Package: grpc-client
+Architecture: any
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+Description: gRPC Client
+ gRPC Client
