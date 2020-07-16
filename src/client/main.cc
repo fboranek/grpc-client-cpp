@@ -28,7 +28,7 @@ public:
         ::Request request;
         request.set_message(value);
 
-        grpc_impl::CompletionQueue cq;
+        ::grpc::CompletionQueue cq;
         std::vector<GrpcStatusContextResponse<::Response>> grpcCalls {stubs.size()};
         std::vector<std::unique_ptr<::grpc::ClientAsyncResponseReaderInterface<::Response>>> rpcs;
 
