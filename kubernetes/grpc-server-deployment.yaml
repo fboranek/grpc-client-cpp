@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fb-grpc-server
+spec:
+  strategy:
+    type: RollingUpdate
+  replicas: 3
+  selector:
+    matchLabels:
+      app: fb-grpc-server
+  template:
+    metadata:
+      annotations:
+        team: "fboranek"
+      labels:
+        app: fb-grpc-server
+        track: stable
+    spec:
+      containers:
+      - name: fb-grpc-server
+        image: fboranek/grpc-server:1.0.0
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: 1
+            memory: 100Mi
+          limits:
+            cpu: 2
+            memory: 200Mi

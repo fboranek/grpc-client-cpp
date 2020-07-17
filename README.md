@@ -126,5 +126,12 @@ On Debian Buster:
 # dpkg-buildpackage 
 ```
 
-##
+## Kubernetes
+
+Deploy the server
+```console
+kubectl --namespace=<my-namespace> apply -f kubernetes/grpc-server-deployment.yaml
+kubectl --namespace=<my-namespace> apply -f kubernetes/grpc-server-service.yaml
+```
+
 
