@@ -1,8 +1,8 @@
-grpc-test (1.1.0) UNRELEASED; urgency=medium
+grpc-test (1.1.0) unstable; urgency=medium
 
   * added some server options
 
- -- Frantisek Boranek <frantisek.boranek@firma.seznam.cz>  Fri, 24 Jul 2020 09:26:06 +0000
+ -- Frantisek Boranek <frantisek.boranek@firma.seznam.cz>  Fri, 24 Jul 2020 09:49:58 +0000
 
 grpc-test (1.0.0) unstable; urgency=medium
 
