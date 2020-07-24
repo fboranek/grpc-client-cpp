@@ -19,8 +19,10 @@ spec:
     spec:
       containers:
       - name: fb-grpc-server
-        image: fboranek/grpc-server:1.0.0
+        image: fboranek/grpc-server:1.1.0
         imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8442
         resources:
           requests:
             cpu: 1
@@ -28,3 +30,6 @@ spec:
           limits:
             cpu: 2
             memory: 200Mi
+        env:
+        - name: grpc_max_connection_age_grace_ms
+          value: '120'
