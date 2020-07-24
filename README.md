@@ -3,7 +3,7 @@
 Server and Client to demonstrate `epollex` problem. When asynchronously call 7 servers on one completion queue.
 The code can be seen in [GrpcClient::testConnection](src/client/main.cc#L19).
 
-Affected version is grpc in branch v1.16.x. When compiling with 1.16.1-1 it works.
+Affected version is grpc in branch v1.26.x. When compiling with 1.16.1-1 it works.
 
 Contains two Debian package `grpc-server` and `grpc-client`.
 
