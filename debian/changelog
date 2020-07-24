@@ -1,5 +1,5 @@
-grpc-test (1.0.0) UNRELEASED; urgency=medium
+grpc-test (1.0.0) unstable; urgency=medium
 
   * Initial release
 
- -- Frantisek Boranek <fboranek@example.com>  Thu, 16 Jul 2020 13:19:18 +0000
+ -- Frantisek Boranek <frantisek.boranek@firma.seznam.cz>  Fri, 24 Jul 2020 10:32:37 +0200
