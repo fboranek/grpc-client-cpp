@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package envoy.api.v2.core;
+
+import "envoy/api/v2/core/grpc_service.proto";
+
+option java_package = "io.envoyproxy.envoy.api.v2.core";
+option java_outer_classname = "EventServiceConfigProto";
+option java_multiple_files = true;
+
+// [#not-implemented-hide:]
+// Configuration of the event reporting service endpoint.
+message EventServiceConfig {
+  oneof config_source_specifier {
+    // Specifies the gRPC service that hosts the event reporting service.
+    GrpcService grpc_service = 1;
+  }
+}
