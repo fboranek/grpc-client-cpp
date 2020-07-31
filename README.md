@@ -18,13 +18,13 @@ dpkg -i grpc-server_1.0.0_amd64.deb
 3) Prepare file with list of servers
 ```console
 # cat hosts.txt 
-fb-server-slave-1:8442
-fb-server-slave-2:8442
-fb-server-slave-3:8442
-fb-server-slave-4:8442
-fb-server-slave-5:8442
-fb-server-slave-6:8442
-fb-server-slave-7:8442
+fb-server-worker-1:8442
+fb-server-worker-2:8442
+fb-server-worker-3:8442
+fb-server-worker-4:8442
+fb-server-worker-5:8442
+fb-server-worker-6:8442
+fb-server-worker-7:8442
 ```
 3) Run test
 ```console
@@ -105,7 +105,100 @@ signal shutdown (+0 ms).
 [2] finished (+100 ms).
 [2/3] was ok (+100 ms).
 ```
+### Test with version gRPC v1.30.2
 
+The result is the same, with disabled keepalive or increased from 150ms to 10s. 
+
+- default poll
+```text
+(buster)6e5192c9d5e7 grpc-client-cpp # obj-x86_64-linux-gnu/src/client/grpc-client conf/host3.txt 
+Configured for: 
+ - [fb-server-worker-1:8442]
+ - [fb-server-worker-2:8442]
+ - [fb-server-worker-3:8442]
+ - [fb-server-worker-4:8442]
+ - [fb-server-worker-5:8442]
+ - [fb-server-worker-6:8442]
+ - [fb-server-worker-7:8442]
+
+
+E0731 09:43:50.370872238   13745 chttp2_transport.cc:2881]   ipv4:10.244.8.173:8442: Keepalive watchdog fired. Closing transport.
+E0731 09:43:50.371600674   13745 chttp2_transport.cc:2881]   ipv4:10.244.8.168:8442: Keepalive watchdog fired. Closing transport.
+E0731 09:43:50.372089307   13745 chttp2_transport.cc:2881]   ipv4:10.244.8.126:8442: Keepalive watchdog fired. Closing transport.
+E0731 09:43:50.372590439   13745 chttp2_transport.cc:2881]   ipv4:10.244.8.152:8442: Keepalive watchdog fired. Closing transport.
+E0731 09:43:50.373062049   13745 chttp2_transport.cc:2881]   ipv4:10.244.8.149:8442: Keepalive watchdog fired. Closing transport.
+[fb-server-worker-3:8442]  ok: {0 count, 0 req/s, 0 ms per request} bad: {31 count, 15.5 req/s, 0 ms per request}>
+[fb-server-worker-4:8442]  ok: {0 count, 0 req/s, 0 ms per request} bad: {31 count, 15.5 req/s, 0 ms per request}>
+[fb-server-worker-5:8442]  ok: {0 count, 0 req/s, 0 ms per request} bad: {31 count, 15.5 req/s, 0 ms per request}>
+[fb-server-worker-6:8442]  ok: {0 count, 0 req/s, 0 ms per request} bad: {31 count, 15.5 req/s, 0 ms per request}>
+[fb-server-worker-7:8442]  ok: {0 count, 0 req/s, 0 ms per request} bad: {31 count, 15.5 req/s, 0 ms per request}>
+[ipv4:10.244.8.126:8442]  ok: {2 count, 1 req/s, 13 ms per request} bad: {17 count, 8.5 req/s, 97 ms per request}>
+[ipv4:10.244.8.149:8442]  ok: {2 count, 1 req/s, 19 ms per request} bad: {17 count, 8.5 req/s, 97 ms per request}>
+[ipv4:10.244.8.152:8442]  ok: {2 count, 1 req/s, 7 ms per request} bad: {17 count, 8.5 req/s, 97 ms per request}>
+[ipv4:10.244.8.153:8442]  ok: {50 count, 25 req/s, 0 ms per request} bad: {0 count, 0 req/s, 0 ms per request}>
+[ipv4:10.244.8.160:8442]  ok: {50 count, 25 req/s, 1 ms per request} bad: {0 count, 0 req/s, 0 ms per request}>
+[ipv4:10.244.8.168:8442]  ok: {2 count, 1 req/s, 10 ms per request} bad: {17 count, 8.5 req/s, 97 ms per request}>
+[ipv4:10.244.8.173:8442]  ok: {2 count, 1 req/s, 7 ms per request} bad: {17 count, 8.5 req/s, 97 ms per request}>
+
+[fb-server-worker-3:8442]  ok: {0 count, 0 req/s, 0 ms per request} bad: {332 count, 166 req/s, 0 ms per request}>
+[fb-server-worker-4:8442]  ok: {0 count, 0 req/s, 0 ms per request} bad: {332 count, 166 req/s, 0 ms per request}>
+[fb-server-worker-5:8442]  ok: {0 count, 0 req/s, 0 ms per request} bad: {332 count, 166 req/s, 0 ms per request}>
+[fb-server-worker-6:8442]  ok: {0 count, 0 req/s, 0 ms per request} bad: {332 count, 166 req/s, 0 ms per request}>
+[fb-server-worker-7:8442]  ok: {0 count, 0 req/s, 0 ms per request} bad: {332 count, 166 req/s, 0 ms per request}>
+[ipv4:10.244.8.153:8442]  ok: {332 count, 166 req/s, 0 ms per request} bad: {0 count, 0 req/s, 0 ms per request}>
+[ipv4:10.244.8.160:8442]  ok: {332 count, 166 req/s, 0 ms per request} bad: {0 count, 0 req/s, 0 ms per request}>
+
+[fb-server-worker-3:8442]  ok: {0 count, 0 req/s, 0 ms per request} bad: {163 count, 81.5 req/s, 0 ms per request}>
+[fb-server-worker-4:8442]  ok: {0 count, 0 req/s, 0 ms per request} bad: {163 count, 81.5 req/s, 0 ms per request}>
+[fb-server-worker-5:8442]  ok: {0 count, 0 req/s, 0 ms per request} bad: {163 count, 81.5 req/s, 0 ms per request}>
+[fb-server-worker-6:8442]  ok: {0 count, 0 req/s, 0 ms per request} bad: {163 count, 81.5 req/s, 0 ms per request}>
+[fb-server-worker-7:8442]  ok: {0 count, 0 req/s, 0 ms per request} bad: {163 count, 81.5 req/s, 0 ms per request}>
+[ipv4:10.244.8.126:8442]  ok: {1 count, 0.5 req/s, 0 ms per request} bad: {9 count, 4.5 req/s, 100 ms per request}>
+[ipv4:10.244.8.149:8442]  ok: {1 count, 0.5 req/s, 0 ms per request} bad: {9 count, 4.5 req/s, 100 ms per request}>
+[ipv4:10.244.8.152:8442]  ok: {1 count, 0.5 req/s, 1 ms per request} bad: {9 count, 4.5 req/s, 100 ms per request}>
+[ipv4:10.244.8.153:8442]  ok: {174 count, 87 req/s, 0 ms per request} bad: {0 count, 0 req/s, 0 ms per request}>
+[ipv4:10.244.8.160:8442]  ok: {174 count, 87 req/s, 0 ms per request} bad: {0 count, 0 req/s, 0 ms per request}>
+[ipv4:10.244.8.168:8442]  ok: {1 count, 0.5 req/s, 0 ms per request} bad: {9 count, 4.5 req/s, 100 ms per request}>
+[ipv4:10.244.8.173:8442]  ok: {1 count, 0.5 req/s, 0 ms per request} bad: {9 count, 4.5 req/s, 100 ms per request}>
+```
+
+- epoll1
+```text
+(buster)6e5192c9d5e7 grpc-client-cpp # obj-x86_64-linux-gnu/src/client/grpc-client conf/host3.txt 
+Configured for: 
+ - [fb-server-worker-1:8442]
+ - [fb-server-worker-2:8442]
+ - [fb-server-worker-3:8442]
+ - [fb-server-worker-4:8442]
+ - [fb-server-worker-5:8442]
+ - [fb-server-worker-6:8442]
+ - [fb-server-worker-7:8442]
+
+
+[ipv4:10.244.8.126:8442]  ok: {320 count, 160 req/s, 0 ms per request} bad: {0 count, 0 req/s, 0 ms per request}>
+[ipv4:10.244.8.149:8442]  ok: {320 count, 160 req/s, 0 ms per request} bad: {0 count, 0 req/s, 0 ms per request}>
+[ipv4:10.244.8.152:8442]  ok: {320 count, 160 req/s, 0 ms per request} bad: {0 count, 0 req/s, 0 ms per request}>
+[ipv4:10.244.8.153:8442]  ok: {320 count, 160 req/s, 0 ms per request} bad: {0 count, 0 req/s, 0 ms per request}>
+[ipv4:10.244.8.160:8442]  ok: {320 count, 160 req/s, 0 ms per request} bad: {0 count, 0 req/s, 0 ms per request}>
+[ipv4:10.244.8.168:8442]  ok: {320 count, 160 req/s, 0 ms per request} bad: {0 count, 0 req/s, 0 ms per request}>
+[ipv4:10.244.8.173:8442]  ok: {320 count, 160 req/s, 0 ms per request} bad: {0 count, 0 req/s, 0 ms per request}>
+
+[ipv4:10.244.8.126:8442]  ok: {317 count, 158.5 req/s, 0 ms per request} bad: {0 count, 0 req/s, 0 ms per request}>
+[ipv4:10.244.8.149:8442]  ok: {317 count, 158.5 req/s, 0 ms per request} bad: {0 count, 0 req/s, 0 ms per request}>
+[ipv4:10.244.8.152:8442]  ok: {317 count, 158.5 req/s, 0 ms per request} bad: {0 count, 0 req/s, 0 ms per request}>
+[ipv4:10.244.8.153:8442]  ok: {317 count, 158.5 req/s, 0 ms per request} bad: {0 count, 0 req/s, 0 ms per request}>
+[ipv4:10.244.8.160:8442]  ok: {317 count, 158.5 req/s, 0 ms per request} bad: {0 count, 0 req/s, 0 ms per request}>
+[ipv4:10.244.8.168:8442]  ok: {317 count, 158.5 req/s, 0 ms per request} bad: {0 count, 0 req/s, 0 ms per request}>
+[ipv4:10.244.8.173:8442]  ok: {317 count, 158.5 req/s, 0 ms per request} bad: {0 count, 0 req/s, 0 ms per request}>
+
+[ipv4:10.244.8.126:8442]  ok: {329 count, 164.5 req/s, 0 ms per request} bad: {0 count, 0 req/s, 0 ms per request}>
+[ipv4:10.244.8.149:8442]  ok: {329 count, 164.5 req/s, 0 ms per request} bad: {0 count, 0 req/s, 0 ms per request}>
+[ipv4:10.244.8.152:8442]  ok: {329 count, 164.5 req/s, 0 ms per request} bad: {0 count, 0 req/s, 0 ms per request}>
+[ipv4:10.244.8.153:8442]  ok: {329 count, 164.5 req/s, 0 ms per request} bad: {0 count, 0 req/s, 0 ms per request}>
+[ipv4:10.244.8.160:8442]  ok: {329 count, 164.5 req/s, 0 ms per request} bad: {0 count, 0 req/s, 0 ms per request}>
+[ipv4:10.244.8.168:8442]  ok: {329 count, 164.5 req/s, 0 ms per request} bad: {0 count, 0 req/s, 0 ms per request}>
+[ipv4:10.244.8.173:8442]  ok: {329 count, 164.5 req/s, 0 ms per request} bad: {0 count, 0 req/s, 0 ms per request}>
+```
 
 ## How to build
 

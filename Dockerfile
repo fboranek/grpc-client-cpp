@@ -1,4 +1,4 @@
-# build cmd: docker build --build-arg VERSION="1.0.0" --tag "fboranek/grpc-server:1.0.0" .
+# build cmd: docker build --build-arg VERSION="1.1.0" --tag "fboranek/grpc-server:1.1.0" .
 
 FROM debian:buster
 

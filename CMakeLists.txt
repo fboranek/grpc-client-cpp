@@ -28,7 +28,7 @@ add_custom_command(
        "${CMAKE_CURRENT_BINARY_DIR}/server.grpc.pb.cc"
        "${CMAKE_CURRENT_BINARY_DIR}/server.grpc.pb.h"
     COMMAND ${PROTOBUF_PROTOC_EXECUTABLE}
-    ARGS --grpc_out ${CMAKE_CURRENT_BINARY_DIR} --plugin=protoc-gen-grpc=${GRPC_CPP_PLUGIN} -I ${CMAKE_CURRENT_SOURCE_DIR}/proto server.proto
+    ARGS --grpc_out ${CMAKE_CURRENT_BINARY_DIR} --plugin=protoc-gen-grpc=${GRPC_CPP_PLUGIN} -I ${CMAKE_CURRENT_SOURCE_DIR}/proto ${CMAKE_CURRENT_SOURCE_DIR}/proto/server.proto
     DEPENDS proto/server.proto
     COMMENT "Running C++ gRPC compiler on proto/server.proto"
     VERBATIM )

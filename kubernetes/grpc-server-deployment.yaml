@@ -31,5 +31,7 @@ spec:
             cpu: 2
             memory: 200Mi
         env:
+        - name: grpc_max_connection_age_ms
+          value: '120000'
         - name: grpc_max_connection_age_grace_ms
-          value: '120'
+          value: '60000'
