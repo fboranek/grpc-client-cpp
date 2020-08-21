@@ -12,11 +12,6 @@ set(CMAKE_INSTALL_PREFIX "/opt" CACHE INTERNAL "Install dir prefix" FORCE)
 
 find_package(PkgConfig REQUIRED)
 find_package(Protobuf REQUIRED)
-find_package(Boost COMPONENTS
-    filesystem
-    program_options
-    system
-REQUIRED)
 
 pkg_check_modules(gRPC REQUIRED grpc++)
 find_program(GRPC_CPP_PLUGIN NAMES grpc_cpp_plugin)

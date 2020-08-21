@@ -8,6 +8,7 @@ Build-Depends:
  cmake (>= 3.12),
  debhelper (>= 12),
  libgrpc++-dev (>= 1.16.1),
+ libprotobuf-dev,
  protobuf-compiler-grpc (>= 1.16.1),
 Standards-Version: 3.9.4
 
