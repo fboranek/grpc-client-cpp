@@ -1,0 +1,36 @@
+name: CI
+
+on:
+ push:
+   branches: [ master ]
+ pull_request:
+   branches: [ master ]
+
+jobs:
+  build-deb-packages:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: build
+        run: docker build --file Dockerfile.build -t grpc-client-cpp:build .
+      - name: create extract container
+        run: docker container create --name extract grpc-client-cpp:build
+      - name: copy artefacts
+        run: docker container cp extract:grpc-server_1.1.0_amd64.deb ./ && docker container cp extract:grpc-client_1.1.0_amd64.deb ./
+      - name: remove extract container
+        run: docker container rm -f extract
+      - name: Upload debian packages
+        uses: actions/upload-artifact@v2
+        with:
+          name: packages
+          path: '*.deb'
+  build-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set VERSION
+        run: echo ::set-env name=VERSION::`dpkg-parsechangelog -S Version`
+      - name: Test
+        run: echo $VERSION
+      - name: build
+        run: docker build --build-arg VERSION="$VERSION" --tag "fboranek/grpc-server:$VERSION" .
