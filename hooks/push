@@ -1,0 +1,10 @@
+#!/bin/bash
+
+VERSION=`dpkg-parsechangelog -S Version`
+
+echo "Pusing v$VERSION ..."
+
+docker push "fboranek/grpc-server:$VERSION"
+docker push "fboranek/grpc-server:latest"
+
+

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+VERSION=`dpkg-parsechangelog -S Version`
+
+echo "Building v$VERSION ..."
+
+docker build --build-arg VERSION="$VERSION" --tag "fboranek/grpc-server:$VERSION" --tag "fboranek/grpc-server:latest" .
+
+

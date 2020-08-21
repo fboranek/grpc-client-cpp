@@ -219,6 +219,13 @@ On Debian Buster:
 # dpkg-buildpackage 
 ```
 
+## How to run
+Using prebuild docker images.
+
+- server: `docker run -it --rm fboranek/grpc-server:1.1.0`
+- client: `docker run -v `pwd`/hosts.conf:/hosts.conf -it --rm fboranek/grpc-server:1.1.0 /opt/grpc/bin/grpc-client /hosts.conf`
+
+
 ## Kubernetes
 
 Deploy the server
