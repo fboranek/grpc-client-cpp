@@ -1,6 +1,6 @@
 # gRPC client
 
-Server and Client to demonstrate `epollex` problem. When asynchronously call 7 servers on one completion queue.
+Server and Client to demonstrate `epollex` problem. The similar issue mentioned [here #22510](https://github.com/grpc/grpc/issues/22510). When asynchronously call 7 servers on one completion queue.
 The code can be seen in [GrpcClient::testConnection](src/client/main.cc#L19).
 
 Affected version is grpc in branch v1.26.x. When compiling with 1.16.1-1 it works.
