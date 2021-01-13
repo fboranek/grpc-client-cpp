@@ -10,7 +10,7 @@ WORKDIR /tmp/
 COPY . /tmp/
 
 RUN /usr/lib/pbuilder/pbuilder-satisfydepends
-RUN dpkg-buildpackage -j4
+RUN dpkg-buildpackage -j4 && for deb in ../*.deb; do dpkg --contents $deb; done
 
 # output:
 # /grpc-server_1.1.0_amd64.deb
