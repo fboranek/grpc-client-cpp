@@ -4,7 +4,11 @@
 
 class GrpcClient {
 public:
+    int total{0};
+    int success{0};
+
     GrpcClient(const std::vector<std::string>& addresses, std::chrono::milliseconds timeout)
+    : timeout(timeout)
     {
         for (auto address : addresses) {
             grpc::ChannelArguments channelArguments;
@@ -63,6 +67,9 @@ public:
             if (reply.status.ok()) { ++okCalls; }
         }
 
+        ++total;
+        success += (okCalls / grpcCalls.size());
+
         std::cout << "[" << okCalls << "/" << grpcCalls.size() << "] was ok (+" << end << " ms)."
                   << std::endl;
     }
@@ -77,7 +84,7 @@ protected:
     };
 
     std::vector<std::unique_ptr<TestService::StubInterface>> stubs;
-    std::chrono::milliseconds timeout {100};
+    std::chrono::milliseconds timeout;
 };
 
 std::unique_ptr<grpc::Server> grpcServer;
@@ -87,21 +94,26 @@ try {
     if (argc < 2) { throw std::runtime_error("Missing argument file with addresses."); }
     std::ifstream file(argv[1]);
     std::vector<std::string> addresses;
-    std::string line;
-    while (file >> line) {
-        if (!line.empty()) { addresses.emplace_back(line); }
+    for (std::string line; std::getline(file, line); ) {
+        if (!line.empty() && line[0] != '#') { addresses.emplace_back(line); }
     }
 
-    std::cout << "Configured for: \n";
-    for (const auto& address : addresses) {
-        std::cout << " - [" << address << "]\n";
+    {
+        std::cout << "Configured for: \n";
+        int index = 0;
+        for (const auto& address : addresses) {
+            std::cout << " - " << index++ << ": [" << address << "]\n";
+        }
+        std::cout << std::endl;
     }
-    std::cout << std::endl;
 
-    GrpcClient grpcClient {addresses, std::chrono::milliseconds(100)};
+    GrpcClient grpcClient {addresses, std::chrono::milliseconds(20)};
     for (size_t i = 0; i < 100; ++i) {
         grpcClient.testConnection("some data");
     }
+    std::cout << "Summary: \n";
+    std::cout << "From " << grpcClient.total << " requests was " << grpcClient.success
+              << " received response from all server. \n";
 }
 catch (const std::exception& e) {
     std::cerr << "Error: " << e.what() << std::endl;
