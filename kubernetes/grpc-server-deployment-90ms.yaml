@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: fb-grpc-server
+  name: fb-grpc-server-90ms
 spec:
   strategy:
     type: RollingUpdate
   replicas: 3
   selector:
     matchLabels:
-      app: fb-grpc-server
+      app: fb-grpc-server-90ms
   template:
     metadata:
       annotations:
         team: "fboranek"
       labels:
-        app: fb-grpc-server
+        app: fb-grpc-server-90ms
         track: stable
     spec:
       containers:
-      - name: fb-grpc-server
+      - name: fb-grpc-server-90ms
         image: fboranek/grpc-server:1.2.0
         imagePullPolicy: IfNotPresent
         ports:
@@ -31,7 +31,5 @@ spec:
             cpu: 2
             memory: 200Mi
         env:
-        - name: grpc_max_connection_age_ms
-          value: '120000'
-        - name: grpc_max_connection_age_grace_ms
-          value: '60000'
+        - name: GRPC_SERVER_DELAY_REQUEST_MS
+          value: '90'
