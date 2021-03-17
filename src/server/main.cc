@@ -1,14 +1,20 @@
 #include "server.grpc.pb.h"
 #include <csignal>
 #include <cstdlib>
+#include <thread>
 #include <grpcpp/grpcpp.h>
 
 class TestServiceImpl final : public TestService::Service {
 public:
+    std::chrono::milliseconds delay{0};
+
     ::grpc::Status test(::grpc::ServerContext* context,
                         const ::Request* request,
                         ::Response* response) override
     {
+        if (delay.count()) {
+            std::this_thread::sleep_for(delay);
+        }
         response->set_message(request->message());
         return {};
     }
@@ -40,6 +46,12 @@ std::unique_ptr<grpc::Server> grpcServer;
 int main(int argc, char* argv[])
 try {
     TestServiceImpl testServiceImpl;
+
+    const char* strVal = std::getenv("GRPC_SERVER_DELAY_REQUEST_MS");
+    if (strVal) {
+        testServiceImpl.delay = std::chrono::milliseconds(std::stoi(strVal));
+        std::cout << "GRPC_SERVER_DELAY_REQUEST_MS: " << testServiceImpl.delay.count() << std::endl;
+    }
 
     grpcServer = [&] {
         grpc::ServerBuilder builder;

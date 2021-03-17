@@ -5,6 +5,9 @@ Description=Test gRPC Server
 LimitNOFILE=32768
 ExecStart=/opt/grpc/bin/grpc-server
 
+# Environment="GRPC_POLL_STRATEGY=epoll1,poll,epollex,none"
+# Environment="GRPC_SERVER_DELAY_REQUEST_MS=90"
+
 Restart=always
 RestartSec=1
 
