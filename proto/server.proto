@@ -1,13 +1,13 @@
 syntax = "proto2";
 
 message Response {
-    optional string message = 1;
+    optional string reply = 1;
 }
 
 message Request {
     optional string message = 1;
 }
 
-service TestService {
-    rpc test(Request) returns (Response);
+service EchoService {
+    rpc echo(Request) returns (Response);
 }

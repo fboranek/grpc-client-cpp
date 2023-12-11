@@ -4,18 +4,18 @@
 #include <thread>
 #include <grpcpp/grpcpp.h>
 
-class TestServiceImpl final : public TestService::Service {
+class TestServiceImpl final : public EchoService::Service {
 public:
     std::chrono::milliseconds delay{0};
 
-    ::grpc::Status test(::grpc::ServerContext* context,
+    ::grpc::Status echo(::grpc::ServerContext* context,
                         const ::Request* request,
                         ::Response* response) override
     {
         if (delay.count()) {
             std::this_thread::sleep_for(delay);
         }
-        response->set_message(request->message());
+        response->set_reply(request->message());
         return {};
     }
 };

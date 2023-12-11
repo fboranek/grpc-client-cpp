@@ -15,7 +15,7 @@ public:
             channelArguments.SetInt(GRPC_ARG_KEEPALIVE_TIME_MS, 1'500);
             channelArguments.SetInt(GRPC_ARG_KEEPALIVE_TIMEOUT_MS, 150);
 
-            stubs.push_back(TestService::NewStub(grpc::CreateCustomChannel(
+            stubs.push_back(EchoService::NewStub(grpc::CreateCustomChannel(
                 address, grpc::InsecureChannelCredentials(), channelArguments)));
         }
     };
@@ -42,7 +42,7 @@ public:
             grpcCalls[i].index = i + 1;
             grpcCalls[i].context.set_deadline(deadline);
 
-            auto rpc = stubs[i]->Asynctest(&grpcCalls[i].context, request, &cq);
+            auto rpc = stubs[i]->Asyncecho(&grpcCalls[i].context, request, &cq);
             rpc->Finish(&grpcCalls[i].response, &grpcCalls[i].status, reinterpret_cast<void*>(i));
             rpcs.push_back(std::move(rpc));
         }
@@ -83,7 +83,7 @@ protected:
         ProtoResponse response;
     };
 
-    std::vector<std::unique_ptr<TestService::StubInterface>> stubs;
+    std::vector<std::unique_ptr<EchoService::StubInterface>> stubs;
     std::chrono::milliseconds timeout;
 };
 
