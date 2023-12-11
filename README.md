@@ -225,6 +225,13 @@ Using prebuild docker images.
 - server: `docker run -it --rm fboranek/grpc-server:1.1.0`
 - client: `docker run -v `pwd`/hosts.conf:/hosts.conf -it --rm fboranek/grpc-server:1.1.0 /opt/grpc/bin/grpc-client /hosts.conf`
 
+Manal query via `grpcurl`
+```
+% grpcurl -plaintext -proto proto/server.proto -d '{"message": "1"}' localhost:8442 TestService/test 
+{
+  "message": "1"
+}
+```
 
 ## Kubernetes
 
