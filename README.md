@@ -7,6 +7,8 @@ Affected version is grpc in branch v1.26.x. When compiling with 1.16.1-1 it work
 
 Contains two Debian package `grpc-server` and `grpc-client`.
 
+**Update:** Version 1.51.1 is no longer affected due to the `epollex` was removed.
+
 ## Step to reproduce
 
 1) Prepare 7 servers with Debian Buster and install package `grpc-server`
@@ -71,7 +73,7 @@ signal shutdown (+0 ms).
 
 ### Workaround
 
-Chose `epoll1` instead of default `epollex` 
+Chose `epoll1` instead of default `epollex`
 
 ```console
 export GRPC_POLL_STRATEGY=epoll1

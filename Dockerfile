@@ -3,16 +3,15 @@
 #########################################################
 # Build deb stage
 #########################################################
-FROM debian:buster AS build
+FROM debian:bookworm AS build
 
 RUN apt-get update \
   && apt-get --assume-yes install \
-  pbuilder aptitude cmake pkg-config
+  build-essential cmake pkg-config debhelper libgrpc++-dev libprotobuf-dev protobuf-compiler-grpc
 
 WORKDIR /tmp/
 COPY . /tmp/
 
-RUN /usr/lib/pbuilder/pbuilder-satisfydepends
 RUN dpkg-buildpackage -j4
 
 # output:
@@ -23,7 +22,7 @@ RUN dpkg-buildpackage -j4
 #########################################################
 # Build docker stage
 #########################################################
-FROM debian:buster
+FROM debian:bookworm
 
 ARG VERSION
 

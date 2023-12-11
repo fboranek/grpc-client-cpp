@@ -1,3 +1,9 @@
+grpc-test (1.2.1) UNRELEASED; urgency=medium
+
+  * bookworm
+
+ -- Frantisek Boranek <frantisek.boranek@firma.seznam.cz>  Mon, 11 Dec 2023 17:47:34 +0100
+
 grpc-test (1.2.0) unstable; urgency=medium
 
   * added environment variable to simulate delay
