@@ -7,9 +7,9 @@ Build-Depends:
  build-essential,
  cmake (>= 3.12),
  debhelper (>= 12),
- libgrpc++-dev (>= 1.16.1),
+ libgrpc++-dev (>= 1.51.1),
  libprotobuf-dev,
- protobuf-compiler-grpc (>= 1.16.1),
+ protobuf-compiler-grpc (>= 1.51.1),
 Standards-Version: 3.9.4
 
 Package: grpc-server

@@ -1,15 +1,14 @@
 # docker build --file Dockerfile.build .
 
-FROM debian:buster
+FROM debian:bookworm
 
 RUN apt-get update \
   && apt-get --assume-yes install \
-  pbuilder aptitude cmake pkg-config
+  build-essential cmake pkg-config debhelper libgrpc++-dev libprotobuf-dev protobuf-compiler-grpc
 
 WORKDIR /tmp/
 COPY . /tmp/
 
-RUN /usr/lib/pbuilder/pbuilder-satisfydepends
 RUN dpkg-buildpackage -j4 && for deb in ../*.deb; do dpkg --contents $deb; done
 
 # output:
