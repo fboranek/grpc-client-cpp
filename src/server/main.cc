@@ -1,21 +1,23 @@
 #include "server.grpc.pb.h"
 #include <csignal>
 #include <cstdlib>
-#include <thread>
 #include <grpcpp/grpcpp.h>
+#include <thread>
 
 class TestServiceImpl final : public EchoService::Service {
 public:
     std::chrono::milliseconds delay{0};
+    std::string echoMessage{};
 
-    ::grpc::Status echo(::grpc::ServerContext* context,
-                        const ::Request* request,
-                        ::Response* response) override
+    ::grpc::Status echo(
+        ::grpc::ServerContext* context,
+        const ::Request* request,
+        ::Response* response) override
     {
         if (delay.count()) {
             std::this_thread::sleep_for(delay);
         }
-        response->set_reply(request->message());
+        response->set_reply(echoMessage + request->message());
         return {};
     }
 };
@@ -37,7 +39,7 @@ public:
         setInt(GRPC_ARG_MAX_CONNECTION_AGE_MS);
         setInt(GRPC_ARG_MAX_CONNECTION_AGE_GRACE_MS);
     }
-    void UpdatePlugins(std::vector<std::unique_ptr<grpc::ServerBuilderPlugin>>*) override { }
+    void UpdatePlugins(std::vector<std::unique_ptr<grpc::ServerBuilderPlugin>>*) override {}
 };
 
 
@@ -47,10 +49,16 @@ int main(int argc, char* argv[])
 try {
     TestServiceImpl testServiceImpl;
 
-    const char* strVal = std::getenv("GRPC_SERVER_DELAY_REQUEST_MS");
-    if (strVal) {
-        testServiceImpl.delay = std::chrono::milliseconds(std::stoi(strVal));
+    const char* strDelayVal = std::getenv("GRPC_SERVER_DELAY_REQUEST_MS");
+    if (strDelayVal) {
+        testServiceImpl.delay = std::chrono::milliseconds(std::stoi(strDelayVal));
         std::cout << "GRPC_SERVER_DELAY_REQUEST_MS: " << testServiceImpl.delay.count() << std::endl;
+    }
+
+    const char* strMessageVal = std::getenv("GRPC_SERVER_ECHO_MESSAGE");
+    if (strMessageVal) {
+        testServiceImpl.echoMessage = "[" + std::string{strMessageVal} + "]:";
+        std::cout << "GRPC_SERVER_ECHO_MESSAGE: " << testServiceImpl.echoMessage << std::endl;
     }
 
     grpcServer = [&] {
