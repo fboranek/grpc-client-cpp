@@ -1,0 +1,46 @@
+---
+# needs at least clang-format 16
+Language: Cpp
+BasedOnStyle: WebKit
+AlignAfterOpenBracket: AlwaysBreak
+AlignConsecutiveAssignments:
+  Enabled:         true
+  AcrossComments:  true
+  PadOperators:    false
+AlignTrailingComments:
+  Kind: Always
+AllowAllArgumentsOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: InlineOnly
+AllowShortIfStatementsOnASingleLine: WithoutElse
+AlwaysBreakTemplateDeclarations: Yes
+AllowShortBlocksOnASingleLine: false
+BinPackArguments: false
+BinPackParameters: false
+BraceWrapping:
+ AfterFunction: true
+ BeforeCatch: true
+ SplitEmptyFunction: false
+BreakBeforeBinaryOperators: NonAssignment
+BreakBeforeBraces: Custom
+BreakConstructorInitializers: BeforeComma
+ColumnLimit: 100
+CompactNamespaces: true
+Cpp11BracedListStyle: true
+ExperimentalAutoDetectBinPacking: false
+FixNamespaceComments: true
+IndentWidth: 4
+KeepEmptyLinesAtTheStartOfBlocks: false
+MaxEmptyLinesToKeep: 2
+NamespaceIndentation: None
+PenaltyReturnTypeOnItsOwnLine: 500
+PointerAlignment: Left
+SpaceAfterTemplateKeyword: false
+SpaceBeforeCpp11BracedList: false
+SpaceInEmptyBlock: false
+
+---
+Language: Proto
+ColumnLimit: 100
+IndentWidth: 4

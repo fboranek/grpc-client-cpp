@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: fb-grpc-server-90ms
-        image: fboranek/grpc-server:1.2.0
+        image: fboranek/grpc-server:1.4.0
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8442
@@ -33,3 +33,8 @@ spec:
         env:
         - name: GRPC_SERVER_DELAY_REQUEST_MS
           value: '90'
+        - name: GRPC_SERVER_ECHO_MESSAGE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP

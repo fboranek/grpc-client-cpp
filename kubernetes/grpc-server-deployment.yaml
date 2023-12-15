@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: fb-grpc-server
-        image: fboranek/grpc-server:1.2.0
+        image: fboranek/grpc-server:1.4.0
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8442
@@ -35,3 +35,8 @@ spec:
           value: '120000'
         - name: grpc_max_connection_age_grace_ms
           value: '60000'
+        - name: GRPC_SERVER_ECHO_MESSAGE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
