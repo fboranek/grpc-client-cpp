@@ -1,4 +1,4 @@
-# build cmd: docker build --build-arg VERSION="1.1.0" --tag "fboranek/grpc-server:1.1.0" .
+#!/usr/bin/env -S docker build --build-arg VERSION="1.5.0" --tag "fboranek/grpc-server:1.5.0" . -f
 
 #########################################################
 # Build deb stage

@@ -1,4 +1,4 @@
-# docker build --file Dockerfile.build .
+#!/usr/bin/env -S docker build --file Dockerfile.build --build-arg VERSION="1.5.0" --tag "fboranek/grpc-server:1.5.0" . -f
 
 FROM debian:bookworm
 
