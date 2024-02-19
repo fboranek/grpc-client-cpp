@@ -1,6 +1,7 @@
 #include "server.grpc.pb.h"
 #include <csignal>
 #include <cstdlib>
+#include <future>
 #include <grpcpp/grpcpp.h>
 #include <thread>
 
@@ -78,7 +79,9 @@ try {
     }();
 
     std::signal(SIGINT, [](int) {
-        if (grpcServer) grpcServer->Shutdown();
+        std::async(std::launch::async, [] {
+            if (grpcServer) grpcServer->Shutdown();
+        }).get();
     });
     grpcServer->Wait();
 }
