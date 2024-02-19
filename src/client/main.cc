@@ -1,6 +1,11 @@
 #include "server.grpc.pb.h"
+#include <boost/program_options.hpp>
+#include <csignal>
 #include <fstream>
 #include <grpcpp/grpcpp.h>
+#include <thread>
+
+namespace {
 
 class GrpcClient {
 public:
@@ -12,8 +17,8 @@ public:
     {
         for (auto address : addresses) {
             grpc::ChannelArguments channelArguments;
-            channelArguments.SetInt(GRPC_ARG_KEEPALIVE_TIME_MS, 1'500);
-            channelArguments.SetInt(GRPC_ARG_KEEPALIVE_TIMEOUT_MS, 150);
+            channelArguments.SetInt(GRPC_ARG_KEEPALIVE_TIME_MS, 5000);
+            channelArguments.SetInt(GRPC_ARG_KEEPALIVE_TIMEOUT_MS, 1000);
 
             stubs.push_back(EchoService::NewStub(grpc::CreateCustomChannel(
                 address,
@@ -91,23 +96,61 @@ protected:
     std::chrono::milliseconds timeout;
 };
 
-std::unique_ptr<grpc::Server> grpcServer;
+std::atomic<bool> shouldTerminate = false;
+void handleSignal(int)
+{
+    shouldTerminate = true;
+}
+} // namespace
 
 int main(int argc, char* argv[])
 try {
-    if (argc < 2) {
-        throw std::runtime_error("Missing argument file with addresses.");
+    namespace po = boost::program_options;
+
+    po::options_description desc("Usage");
+    // clang-format off
+    desc.add_options()
+        ("help,h", "Produce help message.")
+        ("address-file", po::value<std::string>()->required(), "Text file with addess on each line. Can be as first positional argument.")
+        ("daemon,d", po::bool_switch()->default_value(false), "Run as deamon.")
+        ("interval,i", po::value<std::uint32_t>()->default_value(500), "Interval between requests in deaemon mode.");
+    // clang-format on
+    po::positional_options_description p;
+    p.add("address-file", 1);
+
+    po::variables_map vm;
+    po::store(po::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
+
+    if (vm.count("help")) {
+        std::cout << "Grpc client calling echo service to test gRPC communication."
+                  << "\n";
+        std::cout << desc << "\n";
+        return EXIT_FAILURE;
     }
-    std::ifstream file(argv[1]);
-    std::vector<std::string> addresses;
-    for (std::string line; std::getline(file, line);) {
-        if (!line.empty() && line[0] != '#') {
-            addresses.emplace_back(line);
+    po::notify(vm); // throw if required options are missing
+
+    const auto& addressFile = vm["address-file"].as<std::string>();
+    const auto& daemon      = vm["daemon"].as<bool>();
+    const auto interval     = std::chrono::milliseconds{vm["interval"].as<std::uint32_t>()};
+
+
+    auto addresses = [&] {
+        std::vector<std::string> addresses;
+        std::ifstream file(addressFile);
+        for (std::string line; std::getline(file, line);) {
+            if (!line.empty() && line[0] != '#') {
+                addresses.emplace_back(line);
+            }
         }
+        return addresses;
+    }();
+    if (addresses.empty()) {
+        std::cout << "File '" << addressFile << "' do not contains any address\n";
+        return EXIT_FAILURE;
     }
 
     {
-        std::cout << "Configured for: \n";
+        std::cout << "Configured as " << (daemon ? "deamon" : "job") << " for: \n";
         int index = 0;
         for (const auto& address : addresses) {
             std::cout << " - " << index++ << ": [" << address << "]\n";
@@ -116,12 +159,25 @@ try {
     }
 
     GrpcClient grpcClient{addresses, std::chrono::milliseconds(20)};
-    for (size_t i = 0; i < 100; ++i) {
-        grpcClient.testConnection("some data");
+    if (daemon) {
+        std::signal(SIGINT, handleSignal);
+        std::signal(SIGTERM, handleSignal);
+
+        std::cout << "Started to make requests each " << interval << " ...\n";
+        while (!shouldTerminate) {
+            grpcClient.testConnection("some data");
+            std::this_thread::sleep_for(std::chrono::milliseconds{interval});
+        }
+        std::cout << "\nTerminated\n";
+    } else {
+        for (size_t i = 0; i < 100; ++i) {
+            grpcClient.testConnection("some data");
+        }
     }
     std::cout << "Summary: \n";
     std::cout << "From " << grpcClient.total << " requests was " << grpcClient.success
               << " received response from all server. \n";
+    return EXIT_SUCCESS;
 }
 catch (const std::exception& e) {
     std::cerr << "Error: " << e.what() << std::endl;
