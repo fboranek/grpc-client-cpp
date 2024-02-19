@@ -7,7 +7,8 @@ FROM debian:bookworm AS build
 
 RUN apt-get update \
   && apt-get --assume-yes install \
-  build-essential cmake pkg-config debhelper libgrpc++-dev libprotobuf-dev protobuf-compiler-grpc
+  build-essential cmake pkg-config debhelper libgrpc++-dev libprotobuf-dev protobuf-compiler-grpc \
+  libboost-program-options-dev
 
 WORKDIR /tmp/
 COPY . /tmp/

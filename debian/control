@@ -7,6 +7,7 @@ Build-Depends:
  build-essential,
  cmake (>= 3.12),
  debhelper (>= 12),
+ libboost-program-options-dev,
  libgrpc++-dev (>= 1.51.1),
  libprotobuf-dev,
  protobuf-compiler-grpc (>= 1.51.1),
