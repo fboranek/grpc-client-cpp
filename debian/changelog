@@ -1,4 +1,4 @@
-grpc-test (1.5.0) UNRELEASED; urgency=medium
+grpc-test (1.5.0) unstable; urgency=medium
 
   * deamon mode for client
   * fix: error from absl during shutdown
