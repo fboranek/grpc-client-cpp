@@ -13,6 +13,10 @@ RUN apt-get update \
 WORKDIR /tmp/
 COPY . /tmp/
 
+# to install own libgrpc packages
+RUN apt --assume-yes install ./extra_debs/bin/*.deb || true
+RUN apt --assume-yes install ./extra_debs/dev/*.deb || true
+
 RUN dpkg-buildpackage -j4
 
 # output:
@@ -32,10 +36,13 @@ LABEL \
 
 COPY --from=build /grpc-server_${VERSION}_amd64.deb /deb/
 COPY --from=build /grpc-client_${VERSION}_amd64.deb /deb/
+COPY --from=build /tmp/extra_debs/bin /extra_debs/
 
 RUN apt-get update \
+&& (apt --assume-yes install /extra_debs/*.deb || true) \
 && apt-get --assume-yes install /deb/grpc-server_${VERSION}_amd64.deb \
 && apt-get --assume-yes install /deb/grpc-client_${VERSION}_amd64.deb \
+&& rm -rf /extra_debs \
 && rm -rf /deb
 
 EXPOSE 8442

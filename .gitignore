@@ -7,4 +7,5 @@ debian/files
 debian/grpc-client
 debian/grpc-server
 debian/tmp
+extra_debs/*/*.deb
 obj-x86_64-linux-gnu
