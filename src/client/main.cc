@@ -27,61 +27,26 @@ public:
         }
     };
 
-    void testConnection(std::string value)
+    void testConnectionIndex(size_t index)
     {
-        auto start    = std::chrono::high_resolution_clock::now();
-        auto timeDiff = [&]() {
-            return std::chrono::duration_cast<std::chrono::milliseconds>(
-                       std::chrono::high_resolution_clock::now() - start)
-                .count();
-        };
+        if (stubs.size() > index) {
+            auto now = std::chrono::system_clock::now();
+            grpc::ClientContext context;
+            context.set_deadline(now + timeout);
 
-        ::Request request;
-        request.set_message(value);
-
-        ::grpc::CompletionQueue cq;
-        std::vector<GrpcStatusContextResponse<::Response>> grpcCalls{stubs.size()};
-        std::vector<std::unique_ptr<::grpc::ClientAsyncResponseReaderInterface<::Response>>> rpcs;
-
-        // start requests to all servers
-        auto deadline = std::chrono::system_clock::now() + timeout;
-        for (size_t i = 0; i < stubs.size(); ++i) {
-            grpcCalls[i].context.set_deadline(deadline);
-
-            auto rpc = stubs[i]->Asyncecho(&grpcCalls[i].context, request, &cq);
-            rpc->Finish(&grpcCalls[i].response, &grpcCalls[i].status, reinterpret_cast<void*>(i));
-            rpcs.push_back(std::move(rpc));
-        }
-
-        // mark queue as finished
-        cq.Shutdown();
-        std::cout << "signal shutdown (+" << timeDiff() << " ms).\n";
-
-        // wait on all responses
-        void* got_tag;
-        bool ok = false;
-        while (cq.Next(&got_tag, &ok)) {
-            const auto index     = reinterpret_cast<size_t>(got_tag);
-            const auto& response = grpcCalls[index].response;
-            std::cout << "[" << index << "] finished (+" << timeDiff()
-                      << " ms): " << response.reply() << "\n";
-        }
-
-        auto end = timeDiff();
-
-        // do something with results
-        size_t okCalls = 0;
-        for (const auto& reply : grpcCalls) {
-            if (reply.status.ok()) {
-                ++okCalls;
+            ::Request request;
+            request.set_message(std::to_string(
+                std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count()));
+            ::Response response;
+            auto res = stubs[index]->echo(&context, request, &response);
+            if (res.ok()) {
+                std::cout << index << " [ok]: " << response.reply() << std::endl;
+            } else {
+                std::cout << index << " [fail]: " << res.error_message() << std::endl;
             }
+        } else {
+            std::cout << index << " [fail]: no address for index" << index << std::endl;
         }
-
-        ++total;
-        success += (okCalls / grpcCalls.size());
-
-        std::cout << "[" << okCalls << "/" << grpcCalls.size() << "] was ok (+" << end << " ms)."
-                  << std::endl;
     }
 
 protected:
@@ -111,9 +76,7 @@ try {
     // clang-format off
     desc.add_options()
         ("help,h", "Produce help message.")
-        ("address-file", po::value<std::string>()->required(), "Text file with addess on each line. Can be as first positional argument.")
-        ("daemon,d", po::bool_switch()->default_value(false), "Run as deamon.")
-        ("interval,i", po::value<std::uint32_t>()->default_value(500), "Interval between requests in deaemon mode.");
+        ("address-file", po::value<std::string>()->required(), "Text file with addess on each line. Can be as first positional argument.");
     // clang-format on
     po::positional_options_description p;
     p.add("address-file", 1);
@@ -130,9 +93,6 @@ try {
     po::notify(vm); // throw if required options are missing
 
     const auto& addressFile = vm["address-file"].as<std::string>();
-    const auto& daemon      = vm["daemon"].as<bool>();
-    const auto interval     = std::chrono::milliseconds{vm["interval"].as<std::uint32_t>()};
-
 
     auto addresses = [&] {
         std::vector<std::string> addresses;
@@ -150,7 +110,7 @@ try {
     }
 
     {
-        std::cout << "Configured as " << (daemon ? "deamon" : "job") << " for: \n";
+        std::cout << "Configured as deamon for: \n";
         int index = 0;
         for (const auto& address : addresses) {
             std::cout << " - " << index++ << ": [" << address << "]\n";
@@ -158,21 +118,35 @@ try {
         std::cout << std::endl;
     }
 
-    GrpcClient grpcClient{addresses, std::chrono::milliseconds(20)};
-    if (daemon) {
+    GrpcClient grpcClient{addresses, std::chrono::milliseconds(500)};
+    {
         std::signal(SIGINT, handleSignal);
         std::signal(SIGTERM, handleSignal);
 
-        std::cout << "Started to make requests each " << interval << " ...\n";
+        const auto interval        = std::chrono::minutes{60};
+        const auto subInterval     = std::chrono::minutes{1};
+        const auto counterTrashold = interval / subInterval;
+
+        std::cout << "Started to make requests each " << subInterval << " up to " << interval
+                  << std::endl;
+
+        grpcClient.testConnectionIndex(0);
+        grpcClient.testConnectionIndex(1);
+        std::this_thread::sleep_for(std::chrono::seconds{1});
+
+        int counter = 0;
         while (!shouldTerminate) {
-            grpcClient.testConnection("some data");
-            std::this_thread::sleep_for(std::chrono::milliseconds{interval});
+            grpcClient.testConnectionIndex(0);
+            if (counter == counterTrashold) {
+                std::cout << " + " << interval << " ....." << std::endl;
+            }
+            if (counter >= counterTrashold) {
+                grpcClient.testConnectionIndex(1);
+            }
+            ++counter;
+            std::this_thread::sleep_for(subInterval);
         }
         std::cout << "\nTerminated\n";
-    } else {
-        for (size_t i = 0; i < 100; ++i) {
-            grpcClient.testConnection("some data");
-        }
     }
     std::cout << "Summary: \n";
     std::cout << "From " << grpcClient.total << " requests was " << grpcClient.success
